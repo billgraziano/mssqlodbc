@@ -38,6 +38,7 @@ const (
 
 // Helper function to get a list of all ODBC drivers from the registery
 func getDrivers() ([]string, error) {
+
 	k, err := registry.OpenKey(registry.LOCAL_MACHINE, `SOFTWARE\ODBC\ODBCINST.INI\ODBC Drivers`, registry.QUERY_VALUE)
 	if err != nil {
 		return nil, errors.Wrap(err, "openkey")
@@ -115,6 +116,7 @@ func ValidDriver(d string) (bool, error) {
 
 	for _, v := range drivers {
 		if v == d {
+			return true, nil
 		}
 	}
 
