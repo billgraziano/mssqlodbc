@@ -24,12 +24,11 @@ if err != nil {
 defer db.Close()
 ```
 
-Includes the following features
-* Lists the valid drivers installed
-* Selects the "best" driver based on my subjective ranking of them
+Includes the following features:
+* List the valid drivers installed
+* Select the "best" driver based on my subjective ranking of them
 
-Includes support for 
-
+Includes support for: 
 * The generic SQL Server ODBC driver
 * The SQL Server ODBC Driver v11 and v13
 * The SQL Server Native Client ODBC driver v10 and v11
