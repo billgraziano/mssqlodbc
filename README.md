@@ -1,5 +1,7 @@
 # mssqlodbc
-A simple helper library for GO MSSQL ODBC connections
+A simple helper library for GO MSSQL ODBC connections.  This has been tested with 
+https://github.com/alexbrainman/odbc
+
 
 ```go
 cxn := Connection{
@@ -12,12 +14,12 @@ cxn := Connection{
 
 s, err := cxn.ConnectionString()
 if err != nil {
-    t.Error("cxn string", err)
+    return err
 }
 
 db, err := sql.Open("odbc", s)
 if err != nil {
-    t.Error("open", err)
+    return err
 }
 defer db.Close()
 ```
