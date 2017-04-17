@@ -33,7 +33,7 @@ const (
 	GenericODBC string = "SQL Server"
 
 	// NoDriver is an empty string. Usually used for error checking
-	NoDriver string = ""
+	// NoDriver string = ""
 )
 
 // Helper function to get a list of all ODBC drivers from the registery
@@ -55,8 +55,8 @@ func getDrivers() ([]string, error) {
 	return s, nil
 }
 
-// AvailableDrivers returns the available SQL Server drivers on the computer
-func AvailableDrivers() ([]string, error) {
+// InstalledDrivers returns the available SQL Server drivers on the computer
+func InstalledDrivers() ([]string, error) {
 	var drivers []string
 
 	d, err := getDrivers()
@@ -107,18 +107,18 @@ func BestDriver() (string, error) {
 }
 
 // ValidDriver tests if a string is a valid SQL Server Driver on this machine
-func ValidDriver(d string) (bool, error) {
+func ValidDriver(d string) error {
 
-	drivers, err := AvailableDrivers()
+	drivers, err := InstalledDrivers()
 	if err != nil {
-		return false, errors.Wrap(err, "availabledrivers")
+		return errors.Wrap(err, "availabledrivers")
 	}
 
 	for _, v := range drivers {
 		if v == d {
-			return true, nil
+			return nil
 		}
 	}
 
-	return false, ErrInvalidDriver
+	return ErrInvalidDriver
 }

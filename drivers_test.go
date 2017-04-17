@@ -1,7 +1,6 @@
 package mssqlodbc
 
 import (
-	"fmt"
 	"testing"
 )
 
@@ -10,42 +9,35 @@ func TestBestDriver(t *testing.T) {
 	if err != nil {
 		t.Error("Best Driver error: ", err)
 	}
-	fmt.Println("Best Driver: ", s)
+	t.Log("Best Driver: ", s)
 }
+
 func TestODBCDriver(t *testing.T) {
-
 	d := NativeClient11
-	fmt.Println("Native 11: ", d)
+	t.Log("Native 11: ", d)
 }
 
-func TestEmptyDriver(t *testing.T) {
-	var d string
-	fmt.Println("Empty Driver: ", NoDriver)
-	if d != NoDriver {
-		t.Error("empty string != NoDriver")
-	}
-}
-
-func TestAvailableDrivers(t *testing.T) {
-	fmt.Println("Available Drivers")
-	fmt.Println("=====================================")
-	d, err := AvailableDrivers()
+func TestInstalledDrivers(t *testing.T) {
+	t.Log("Available Drivers")
+	t.Log("=====================================")
+	d, err := InstalledDrivers()
 	if err != nil {
 		t.Error("available drivers: ", err)
 	}
 	for _, s := range d {
-		fmt.Println(s)
+		t.Log(s)
 	}
 }
 
 func TestValidDrivers(t *testing.T) {
-	_, err := ValidDriver("test")
+	var err error
+	err = ValidDriver("test")
 	if err != ErrInvalidDriver {
 		t.Error("'test' should be invalid driver")
 	}
 
-	v, err := ValidDriver("SQL Server Native Client 11.0")
-	if v == false || err != nil {
+	err = ValidDriver("SQL Server Native Client 11.0")
+	if err != nil {
 		t.Error("Native11: failed")
 	}
 }
