@@ -27,7 +27,7 @@ defer db.Close()
 Includes the following features:
 * List the valid drivers installed
 * Select the "best" driver based on my subjective ranking of them
-* Parse a SQL Server ODBC connection string into it's parts
+* Parse a SQL Server ODBC connection string into a Connection
 
 Includes support for: 
 * The generic SQL Server ODBC driver
