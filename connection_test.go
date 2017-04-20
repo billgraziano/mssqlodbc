@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	_ "github.com/alexbrainman/odbc"
+	"log"
 )
 
 func TestCxnString(t *testing.T) {
@@ -70,19 +71,15 @@ func TestAll(t *testing.T) {
 		database   string
 		app        string
 		subnetfail bool
+		trusted    bool
 	}{
-		{server: "localhost\\SQL2014"},
-		{server: "localhost\\SQL2016"},
-		{server: "localhost\\SQL2012"},
-		{server: "localhost\\SQL2016", database: "tempdb"},
-		{server: "localhost\\SQL2012", app: "junk"},
-		{server: "localhost\\SQL2012", subnetfail: true},
+		{server: "localhost\\SQL2014", trusted: true},
+		{server: "localhost\\SQL2016", trusted: true},
+		{server: "localhost\\SQL2012", trusted: true},
+		{server: "localhost\\SQL2016", database: "tempdb", trusted: true},
+		{server: "localhost\\SQL2012", app: "junk", trusted: true},
+		{server: "localhost\\SQL2012", subnetfail: true, trusted: true},
 	}
-	// var tests = []struct {
-	// 	driver string
-	// }{
-	// 	{NativeClient10},
-	// }
 
 	drivers, err := InstalledDrivers()
 	if err != nil {
@@ -102,14 +99,43 @@ func TestAll(t *testing.T) {
 				cxn.MultiSubnetFailover = true
 			}
 
-			//cxn.AppName = "CXN Helper"
-			//cxn.Database = "tempdb"
 			cxn.SetDriver(v)
 			s, err := cxn.ConnectionString()
 			if err != nil {
 				t.Error(v, "connectionstring", err)
 			}
 
+			// Test that I can round trip
+			c2, err := Parse(s)
+			if err != nil {
+				t.Error(v, "parse-error", err, s)
+			}
+
+			if c2.User == "" && c2.Password == "" {
+				c2.Trusted = true
+			}
+
+			if c2.Server != tt.server {
+				t.Error(v, "round-trip-server", c2)
+			}
+
+			if c2.Driver() != v {
+				t.Error(v, "round-trip-driver", c2)
+			}
+
+			if c2.Database != tt.database {
+				t.Error(v, "round-trip-database", c2)
+			}
+
+			if c2.AppName != tt.app {
+				t.Error(v, "round-trip-app", c2)
+			}
+
+			if c2.MultiSubnetFailover != tt.subnetfail {
+				t.Error(v, "round-trip-subnet", c2)
+			}
+
+			// Test an actual connection
 			db, err := sql.Open("odbc", s)
 			if err != nil {
 				t.Error(v, "open", err)
@@ -138,9 +164,6 @@ func TestAll(t *testing.T) {
 			}
 
 			if tt.database != "" && dbname != tt.database {
-				//t.Log(dbname)
-				//t.Log(tt.database)
-				//t.Log(s)
 				t.Error(v, tt, "dbname-set")
 			}
 
@@ -152,4 +175,29 @@ func TestAll(t *testing.T) {
 
 		}
 	}
+}
+
+func TestParse(t *testing.T) {
+	log.Println("********* Testing round trips *********")
+	var c Connection
+	var err error
+	var s string
+
+	c, err = Parse("AYZ;Driver={SQL Server Native Client 11.0};Server=127.0.0.1,59625;Database=tempdb;uid=test;pwd=test;App=IsItSql;")
+	if err == nil {
+		t.Error("wanted error on bad attrib", c)
+	}
+
+	c, err = Parse("Driver={SQL Server Native Client 11.0};Server=127.0.0.1,59625;Database=tempdb;uid=test;pwd=test;App=IsItSql;")
+	if err != nil {
+		t.Error("parse: ", err)
+	}
+	if c.Driver() != NativeClient11 {
+		t.Error("driver: Expected Native Client 11; got ", c.Driver())
+	}
+	s, err = c.ConnectionString()
+	if err != nil {
+		t.Error("first fail: ", err, s)
+	}
+	log.Println("Generated string: ", s)
 }

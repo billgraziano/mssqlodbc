@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/pkg/errors"
+	"strings"
 )
 
 // Connection holds information about an ODBC SQL Server connection
@@ -63,7 +64,7 @@ func (c *Connection) ConnectionString() (string, error) {
 
 	// Authentication
 	if c.Trusted || (c.User == "" && c.Password == "") {
-		cxn += fmt.Sprintf("Trusted_Connection=yes; ")
+		cxn += fmt.Sprintf("Trusted_Connection=Yes; ")
 	} else {
 		cxn += fmt.Sprintf("UID=%s; PWD=%s; ", c.User, c.Password)
 	}
@@ -84,4 +85,69 @@ func (c *Connection) ConnectionString() (string, error) {
 	}
 
 	return cxn, nil
+}
+
+// Parse converts a connection string into a Connection
+func Parse(s string) (Connection, error) {
+	var c Connection
+	var err error
+
+	// Remove any spaces at the beginning and end
+	s = strings.TrimSpace(s)
+
+	// remove a trailing ; if present
+	// split the string on the ;
+	attribs := strings.Split(strings.TrimSuffix(s, ";"), ";")
+
+	for _, a := range attribs {
+
+		// get the bits around the = sign
+		p := strings.Split(a, "=")
+
+		// all are in format: attribute ::= attribute-keyword=[{]attribute-value[}]
+		if len(p) != 2 {
+			return c, errors.New("bad attrib: " + a)
+		}
+
+		k := strings.ToLower(strings.TrimSpace(p[0]))
+		v := strings.TrimSpace(p[1])
+
+		// remove the possible { and } around a value
+		v = strings.TrimPrefix(strings.TrimSuffix(v, "}"), "{")
+
+		switch k {
+		case "driver":
+			err = c.SetDriver(v)
+			if err != nil {
+				return c, errors.Wrap(err, "setdriver")
+			}
+
+		case "server":
+			c.Server = v
+
+		case "uid":
+			c.User = v
+
+		case "pwd":
+			c.Password = v
+
+		case "database":
+			c.Database = v
+
+		case "app":
+			c.AppName = v
+
+		case "trusted_connection":
+			if strings.ToLower(v) == "yes" {
+				c.Trusted = true
+			}
+
+		case "multisubnetfailover":
+			if strings.ToLower(v) == "yes" {
+				c.MultiSubnetFailover = true
+			}
+		}
+	}
+
+	return c, err
 }
