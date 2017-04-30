@@ -192,6 +192,7 @@ func TestParse(t *testing.T) {
 	if err != nil {
 		t.Error("parse: ", err)
 	}
+
 	if c.Driver() != NativeClient11 {
 		t.Error("driver: Expected Native Client 11; got ", c.Driver())
 	}
@@ -199,5 +200,22 @@ func TestParse(t *testing.T) {
 	if err != nil {
 		t.Error("first fail: ", err, s)
 	}
+
 	log.Println("Generated string: ", s)
+
+	c, err = Parse("Driver={SQL Server Native Client 11.0};Addr=127.0.0.1,59625;User ID=test;Password=test;Application Name=IsItSql;")
+	if err != nil {
+		t.Error("parse: ", err)
+	}
+	if c.AppName != "IsItSql" || c.User != "test" || c.Password != "test" || c.Server != "127.0.0.1,59625" {
+		t.Error("bad parse of new parameters", c)
+	}
+
+	c, err = Parse("Driver={SQL Server Native Client 11.0};Addrress=127.0.0.1,59625;User ID=test;Password=test;Application Name=IsItSql;")
+	if err != nil {
+		t.Error("parse: ", err)
+	}
+	if c.AppName != "IsItSql" || c.User != "test" || c.Password != "test" || c.Server != "127.0.0.1,59625" {
+		t.Error("bad parse of new parameters #2", c)
+	}
 }

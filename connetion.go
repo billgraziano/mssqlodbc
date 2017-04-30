@@ -122,19 +122,19 @@ func Parse(s string) (Connection, error) {
 				return c, errors.Wrap(err, "setdriver")
 			}
 
-		case "server":
+		case "server", "address", "addr":
 			c.Server = v
 
-		case "uid":
+		case "uid", "user id":
 			c.User = v
 
-		case "pwd":
+		case "pwd", "password":
 			c.Password = v
 
 		case "database":
 			c.Database = v
 
-		case "app":
+		case "app", "application name":
 			c.AppName = v
 
 		case "trusted_connection":
