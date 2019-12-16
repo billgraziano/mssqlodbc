@@ -1,7 +1,6 @@
 package mssqlodbc
 
 import (
-	"fmt"
 	"sort"
 	"strings"
 
@@ -92,9 +91,7 @@ func BestDriver() (string, error) {
 	}
 
 	for _, d := range ordered {
-		fmt.Printf("  testing: %s\n", d)
 		for _, v := range drivers {
-			fmt.Printf("    against: %s\n", v)
 			if strings.EqualFold(d, v) {
 				return d, nil
 			}
