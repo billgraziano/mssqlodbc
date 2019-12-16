@@ -1,7 +1,9 @@
 package mssqlodbc
 
 import (
+	"fmt"
 	"sort"
+	"strings"
 
 	"github.com/pkg/errors"
 	"golang.org/x/sys/windows/registry"
@@ -76,33 +78,28 @@ func InstalledDrivers() ([]string, error) {
 // BestDriver returns the "best" driver installed on the machine
 func BestDriver() (string, error) {
 
-	s, err := getDrivers()
+	drivers, err := getDrivers()
 	if err != nil {
 		return "", errors.Wrap(err, "getDrivers")
 	}
 
-	sort.Strings(s)
-
-	if sort.SearchStrings(s, NativeClient11) < len(s) {
-		return NativeClient11, nil
+	ordered := []string{
+		NativeClient11,
+		NativeClient10,
+		ODBC13,
+		ODBC11,
+		GenericODBC,
 	}
 
-	if sort.SearchStrings(s, NativeClient10) < len(s) {
-		return NativeClient10, nil
+	for _, d := range ordered {
+		fmt.Printf("  testing: %s\n", d)
+		for _, v := range drivers {
+			fmt.Printf("    against: %s\n", v)
+			if strings.EqualFold(d, v) {
+				return d, nil
+			}
+		}
 	}
-
-	if sort.SearchStrings(s, ODBC13) < len(s) {
-		return ODBC13, nil
-	}
-
-	if sort.SearchStrings(s, ODBC11) < len(s) {
-		return ODBC11, nil
-	}
-
-	if sort.SearchStrings(s, GenericODBC) < len(s) {
-		return GenericODBC, nil
-	}
-
 	return "", ErrNoDrivers
 }
 
