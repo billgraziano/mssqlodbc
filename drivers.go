@@ -24,6 +24,9 @@ const (
 	// NativeClient10 is an Native SQL Server Driver version 10
 	NativeClient10 string = "SQL Server Native Client 10.0"
 
+	// ODBC17 is an ODBC SQL Server Driver version 17
+	ODBC17 string = "ODBC Driver 17 for SQL Server"
+
 	// ODBC13 is an ODBC SQL Server Driver version 13
 	ODBC13 string = "ODBC Driver 13 for SQL Server"
 
@@ -36,6 +39,15 @@ const (
 	// NoDriver is an empty string. Usually used for error checking
 	// NoDriver string = ""
 )
+
+var orderedDrivers = []string{
+	NativeClient11,
+	NativeClient10,
+	ODBC17,
+	ODBC13,
+	ODBC11,
+	GenericODBC,
+}
 
 // Helper function to get a list of all ODBC drivers from the registery
 func getDrivers() ([]string, error) {
@@ -66,8 +78,10 @@ func InstalledDrivers() ([]string, error) {
 	}
 
 	for _, v := range d {
-		if v == NativeClient11 || v == NativeClient10 || v == ODBC11 || v == ODBC13 || v == GenericODBC {
-			drivers = append(drivers, v)
+		for _, d := range orderedDrivers {
+			if strings.EqualFold(d, v) {
+				drivers = append(drivers, v)
+			}
 		}
 	}
 
@@ -82,15 +96,7 @@ func BestDriver() (string, error) {
 		return "", errors.Wrap(err, "getDrivers")
 	}
 
-	ordered := []string{
-		NativeClient11,
-		NativeClient10,
-		ODBC13,
-		ODBC11,
-		GenericODBC,
-	}
-
-	for _, d := range ordered {
+	for _, d := range orderedDrivers {
 		for _, v := range drivers {
 			if strings.EqualFold(d, v) {
 				return d, nil

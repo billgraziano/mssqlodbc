@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	_ "github.com/alexbrainman/odbc"
-	"log"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestCxnString(t *testing.T) {
@@ -27,7 +27,7 @@ func TestCxnString(t *testing.T) {
 
 func TestOne(t *testing.T) {
 	cxn := Connection{
-		Server:              "localhost\\SQL2014",
+		Server:              "D40\\SQL2014",
 		Database:            "tempdb",
 		AppName:             "gosql",
 		Trusted:             true,
@@ -75,10 +75,7 @@ func TestAll(t *testing.T) {
 	}{
 		{server: "localhost\\SQL2014", trusted: true},
 		{server: "localhost\\SQL2016", trusted: true},
-		{server: "localhost\\SQL2012", trusted: true},
 		{server: "localhost\\SQL2016", database: "tempdb", trusted: true},
-		{server: "localhost\\SQL2012", app: "junk", trusted: true},
-		{server: "localhost\\SQL2012", subnetfail: true, trusted: true},
 	}
 
 	drivers, err := InstalledDrivers()
@@ -178,7 +175,9 @@ func TestAll(t *testing.T) {
 }
 
 func TestParse(t *testing.T) {
-	log.Println("********* Testing round trips *********")
+
+	assert := assert.New(t)
+
 	var c Connection
 	var err error
 	var s string
@@ -200,8 +199,7 @@ func TestParse(t *testing.T) {
 	if err != nil {
 		t.Error("first fail: ", err, s)
 	}
-
-	log.Println("Generated string: ", s)
+	assert.Equal("Driver={SQL Server Native Client 11.0}; Server=127.0.0.1,59625; UID=test; PWD=test; Database=tempdb; App=IsItSql;", s)
 
 	c, err = Parse("Driver={SQL Server Native Client 11.0};Addr=127.0.0.1,59625;User ID=test;Password=test;Application Name=IsItSql;")
 	if err != nil {
@@ -211,7 +209,7 @@ func TestParse(t *testing.T) {
 		t.Error("bad parse of new parameters", c)
 	}
 
-	c, err = Parse("Driver={SQL Server Native Client 11.0};Addrress=127.0.0.1,59625;User ID=test;Password=test;Application Name=IsItSql;")
+	c, err = Parse("Driver={SQL Server Native Client 11.0};Address=127.0.0.1,59625;User ID=test;Password=test;Application Name=IsItSql;")
 	if err != nil {
 		t.Error("parse: ", err)
 	}

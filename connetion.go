@@ -3,8 +3,9 @@ package mssqlodbc
 import (
 	"fmt"
 
-	"github.com/pkg/errors"
 	"strings"
+
+	"github.com/pkg/errors"
 )
 
 // Connection holds information about an ODBC SQL Server connection
@@ -83,6 +84,8 @@ func (c *Connection) ConnectionString() (string, error) {
 	if c.MultiSubnetFailover {
 		cxn += "MultiSubnetFailover=Yes; "
 	}
+
+	cxn = strings.TrimSpace(cxn)
 
 	return cxn, nil
 }
