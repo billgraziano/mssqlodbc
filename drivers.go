@@ -8,6 +8,12 @@ import (
 	"golang.org/x/sys/windows/registry"
 )
 
+// References
+// https://learn.microsoft.com/en-us/sql/connect/connect-history?view=sql-server-ver16
+// https://learn.microsoft.com/en-us/sql/connect/odbc/microsoft-odbc-driver-for-sql-server?view=sql-server-ver16
+// https://learn.microsoft.com/en-us/sql/connect/odbc/windows/microsoft-odbc-driver-for-sql-server-on-windows?view=sql-server-ver16
+// https://techcommunity.microsoft.com/t5/sql-server-blog/bg-p/SQLServer/label-name/SQLServerDrivers
+
 // ErrNoDrivers is returned if no valid ODBC SQL Server drivers are found
 var ErrNoDrivers = errors.New("mssqlodbc: no drivers found")
 
@@ -45,10 +51,10 @@ const (
 
 var orderedDrivers = []string{
 	ODBC18,
-	NativeClient11,
-	NativeClient10,
 	ODBC17,
+	NativeClient11, // doesn't support beyond SQL Server 2012
 	ODBC13,
+	NativeClient10,
 	ODBC11,
 	GenericODBC,
 }
