@@ -65,7 +65,7 @@ func (c *Connection) ConnectionString() (string, error) {
 
 	// Authentication
 	if c.Trusted || (c.User == "" && c.Password == "") {
-		cxn += fmt.Sprintf("Trusted_Connection=Yes; ")
+		cxn += "Trusted_Connection=Yes; "
 	} else {
 		cxn += fmt.Sprintf("UID=%s; PWD=%s; ", c.User, c.Password)
 	}

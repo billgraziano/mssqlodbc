@@ -31,6 +31,6 @@ Includes the following features:
 
 Includes support for: 
 * The generic SQL Server ODBC driver
-* The SQL Server ODBC Driver v11 and v13
+* The SQL Server ODBC Driver v11, v13, v17, v18
 * The SQL Server Native Client ODBC driver v10 and v11
 

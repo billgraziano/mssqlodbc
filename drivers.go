@@ -24,6 +24,9 @@ const (
 	// NativeClient10 is an Native SQL Server Driver version 10
 	NativeClient10 string = "SQL Server Native Client 10.0"
 
+	// ODBC18 is an ODBC SQL Server Driver version 18
+	ODBC18 string = "ODBC Driver 18 for SQL Server"
+
 	// ODBC17 is an ODBC SQL Server Driver version 17
 	ODBC17 string = "ODBC Driver 17 for SQL Server"
 
@@ -41,6 +44,7 @@ const (
 )
 
 var orderedDrivers = []string{
+	ODBC18,
 	NativeClient11,
 	NativeClient10,
 	ODBC17,
