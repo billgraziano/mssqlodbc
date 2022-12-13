@@ -15,10 +15,10 @@ import (
 // https://techcommunity.microsoft.com/t5/sql-server-blog/bg-p/SQLServer/label-name/SQLServerDrivers
 
 // ErrNoDrivers is returned if no valid ODBC SQL Server drivers are found
-var ErrNoDrivers = errors.New("mssqlodbc: no drivers found")
+var ErrNoDrivers = errors.New("no odbc drivers found")
 
 // ErrInvalidDriver indiates that an ODBC SQL Server driver is invalid
-var ErrInvalidDriver = errors.New("mssqlodbc: invalid driver")
+var ErrInvalidDriver = errors.New("invalid driver")
 
 // ODBCDriver is the name of an ODBC SQL Server Drive
 //type ODBCDriver string

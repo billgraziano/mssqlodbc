@@ -27,23 +27,34 @@ func main() {
 	log.Printf("best driver: %s\n", best)
 
 	fqdn := flag.String("fqdn", "", "fqdn to test connecting")
+	driver := flag.String("driver", "", "driver to use")
 	flag.Parse()
 
 	if *fqdn == "" {
 		return
 	}
-	log.Printf("connecting to: %s\n", *fqdn)
+	if *driver == "" {
+		*driver = best
+	}
+	log.Printf("fqdn: %s\n", *fqdn)
+	log.Printf("driver: %s\n", *driver)
 
 	cxn := mssqlodbc.Connection{
 		Server:  *fqdn,
 		Trusted: true,
 		AppName: "odbctest.exe",
 	}
+	err = cxn.SetDriver(*driver)
+	if err != nil {
+		log.Fatal(errors.Wrap(err, "cxn.setdriver"))
+	}
 
 	s, err := cxn.ConnectionString()
 	if err != nil {
 		log.Fatal(errors.Wrap(err, "cxn.ConnectionString"))
 	}
+	log.Printf("connection string: %s", s)
+
 	db, err := sql.Open("odbc", s)
 	if err != nil {
 		log.Fatal(errors.Wrap(err, "sql.open"))

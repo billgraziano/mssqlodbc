@@ -17,6 +17,7 @@ type Connection struct {
 	Trusted             bool
 	AppName             string
 	Database            string
+	Encrypt             string
 	MultiSubnetFailover bool
 }
 
@@ -85,6 +86,24 @@ func (c *Connection) ConnectionString() (string, error) {
 		cxn += "MultiSubnetFailover=Yes; "
 	}
 
+	// Encrypt
+	// If no encryption specified ODBC18, set to optional
+	c.Encrypt = strings.TrimSpace(c.Encrypt)
+	if c.Encrypt == "" && c.driver == ODBC18 {
+		c.Encrypt = EncryptOptional
+	}
+	if c.Encrypt != "" &&
+		c.Encrypt != EncryptMandatory &&
+		c.Encrypt != EncryptNo &&
+		c.Encrypt != EncryptOptional &&
+		c.Encrypt != EncryptStrict &&
+		c.Encrypt != EncryptYes {
+		return cxn, ErrInvalidEncrypt
+	}
+	if c.Encrypt != "" {
+		cxn += fmt.Sprintf("Encrypt=%s; ", c.Encrypt)
+	}
+
 	cxn = strings.TrimSpace(cxn)
 
 	return cxn, nil
@@ -149,6 +168,8 @@ func Parse(s string) (Connection, error) {
 			if strings.ToLower(v) == "yes" {
 				c.MultiSubnetFailover = true
 			}
+		case "encrypt":
+			c.Encrypt = v
 		}
 	}
 

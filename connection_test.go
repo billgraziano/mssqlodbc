@@ -175,7 +175,6 @@ func TestAll(t *testing.T) {
 }
 
 func TestParse(t *testing.T) {
-
 	assert := assert.New(t)
 
 	var c Connection
@@ -216,4 +215,27 @@ func TestParse(t *testing.T) {
 	if c.AppName != "IsItSql" || c.User != "test" || c.Password != "test" || c.Server != "127.0.0.1,59625" {
 		t.Error("bad parse of new parameters #2", c)
 	}
+}
+
+func TestEncrypt(t *testing.T) {
+	assert := assert.New(t)
+
+	var c Connection
+	var err error
+	var s string
+
+	c, err = Parse("Driver={ODBC Driver 18 for SQL Server};Encrypt=Optional;Address=127.0.0.1,59625;User ID=test;Password=test;Application Name=IsItSql;")
+	assert.NoError(err)
+	assert.Equal(ODBC18, c.Driver())
+	assert.Equal(EncryptOptional, c.Encrypt)
+
+	var cxn Connection
+	cxn.Server = "localhost,12345"
+	cxn.Encrypt = EncryptStrict
+	cxn.Trusted = true
+	s, err = cxn.ConnectionString()
+	assert.NoError(err)
+	c, err = Parse(s)
+	assert.NoError(err)
+	assert.Equal(EncryptStrict, c.Encrypt)
 }
