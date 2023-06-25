@@ -50,13 +50,13 @@ const (
 )
 
 var orderedDrivers = []string{
-	ODBC18,
-	ODBC17,
-	NativeClient11, // doesn't support beyond SQL Server 2012
-	ODBC13,
+	ODBC18,         // Released 2022
+	ODBC17,         // Released 2018
+	ODBC13,         // Released 2016 (adds SQL 2016)
+	ODBC11,         // Released 2014 (adds SQL 2012)
+	NativeClient11, // Released 2011
 	NativeClient10,
-	ODBC11,
-	GenericODBC,
+	GenericODBC, // v10.x
 }
 
 // Helper function to get a list of all ODBC drivers from the registery
